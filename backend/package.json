@@ -1,0 +1,25 @@
+{
+  "name": "@email/backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.598.0",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.31.2",
+    "googleapis": "^135.0.0",
+    "postgres": "^3.4.4",
+    "sst": "^3.0.13"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.137",
+    "drizzle-kit": "^0.22.7",
+    "typescript": "^5"
+  }
+}

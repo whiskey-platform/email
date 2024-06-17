@@ -1,0 +1,57 @@
+{
+  "headers": {
+    "X-Forwarding-Service": "ImprovMX v3.0.0",
+    "Received-SPF": [
+      "pass (improvmx.com: domain of example.com designates xxx.xxx.xxx.xxx as permitted sender) receiver=mx1.improvmx.com; client-ip=xxx.xxx.xxx.xxx; helo=example.com;"
+    ],
+    "Delivered-To": "example@yourdomain.com",
+    "DKIM-Signature": [
+      "v=1; a=rsa-sha256; c=relaxed/relaxed; d=improvmx.com; i=@improvmx.com; q=dns/txt; s=20191126; t=1581630208; h=date : from : to : subject : content-type : message-id; bh=pwCRxelulesFS4CeB7c7JkXr7yW4Mx6hmFEr6sYnDiQ=; b=hBXwNE3Akntj0cf0qC+WdATn85jDPJzyyQNHvIeOQwUVk0E9FWbcX3HPC32sXITuYbLM9 9UtVQ1GK4u/k0NMXSzJfZtjcmjV4fnmHgbmmiapdOKE4f+816p0H8Htwvj/j5+OHShLk9Iy J8KdQ3f4kfHzp46+ZRymh/Z2HUHveDU/2v2w269FYIVAdWZddtbnBB7FRHFJt29i7FKSDeR FMwuo3UBZugKY3pVMMR0sYazpgOxvBYKEv7ymhtIl/nxcxq6xb2vc0qDl51HPhkwjQ5NhyT ZsDyJp/36NYaiiY4W1ZNxayxVtpJYPCCApLFZS20cfOCG3OYL8qjWZBYu1lg=="
+    ],
+    "Authentication-Results": [
+      "mx1.improvmx.com; spf=pass (improvmx.com: domain of example.com designates xxx.xxx.xxx.xxx as permitted sender) smtp.mailfrom=example.com; dkim=none"
+    ]
+  },
+  "to": [
+    {
+      "name": "Example user",
+      "email": "example@yourdomain.com"
+    }
+  ],
+  "from": {
+    "name": "Email Test",
+    "email": "test@example.com"
+  },
+  "subject": "This is a sample email to show the webhooks",
+  "message-id": "random-message-id-generated@example.com",
+  "date": "Thu, 13 Feb 2020 13:44:12 -0800",
+  "return-path": {
+    "name": null,
+    "email": "test@example.com"
+  },
+  "timestamp": 1581601452,
+  "text": "This is a sample text that is present in the email's body as the text/plain value.[image: screenshot.png]",
+  "html": "This is a sample text that is present in the email's body as the text/html value.",
+  "inlines": [
+    {
+      "type": "image/png",
+      "name": "screenshot.png",
+      "content": "{base64_encoded_data}",
+      "cid": "some_random_id"
+    }
+  ],
+  "attachments": [
+    {
+      "type": "application/pdf",
+      "name": "all-life-secrets.pdf",
+      "content": "{base64_encoded_data}",
+      "encoding": "binary"
+    },
+    {
+      "type": "application/pdf",
+      "name": "getting-out-of-the-simulation.pdf",
+      "content": "{base64_encoded_data}",
+      "encoding": "binary"
+    }
+  ]
+}
