@@ -1,0 +1,11 @@
+
+# sst
+.sst
+
+node_modules/
+
+*.local
+
+google-oauth-info.json
+pnpm-lock.yaml
+*.md

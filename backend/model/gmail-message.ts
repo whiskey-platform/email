@@ -1,5 +1,5 @@
-import { gmail_v1 } from "googleapis";
-import { EmailMessage } from "./message";
+import { gmail_v1 } from 'googleapis';
+import { EmailMessage } from './message';
 
 function extractNameAndEmail(str: string): { email: string; name?: string } {
   // Sample: "ORCID - Do not reply \u003cDoNotReply@verify.orcid.org\u003e"
@@ -10,23 +10,19 @@ function extractNameAndEmail(str: string): { email: string; name?: string } {
   return { email: str };
 }
 
-function generateMessageIdFromGmailMessage(
-  gmailMessage: gmail_v1.Schema$Message
-): string {
+function generateMessageIdFromGmailMessage(gmailMessage: gmail_v1.Schema$Message): string {
   const headers = gmailMessage.payload?.headers ?? [];
-  const dateHeader = headers.find((header: any) => header.name === "Date")!;
+  const dateHeader = headers.find((header: any) => header.name === 'Date')!;
   const timestamp = new Date(dateHeader.value!).getTime();
-  const from = extractNameAndEmail(
-    headers.find((header: any) => header.name === "From")!.value!
-  );
-  return timestamp + ":" + from.email;
+  const from = extractNameAndEmail(headers.find((header: any) => header.name === 'From')!.value!);
+  return timestamp + '-' + from.email;
 }
 
-function generateDictionaryFromHeaders(
-  headers: gmail_v1.Schema$MessagePartHeader[]
-): { [key: string]: string | string[] } {
+function generateDictionaryFromHeaders(headers: gmail_v1.Schema$MessagePartHeader[]): {
+  [key: string]: string | string[];
+} {
   const dict: { [key: string]: string | string[] } = {};
-  headers.forEach((header) => {
+  headers.forEach(header => {
     if (dict[header.name!]) {
       if (Array.isArray(dict[header.name!])) {
         dict[header.name!] = dict[header.name!].concat(header.value!);
@@ -40,20 +36,14 @@ function generateDictionaryFromHeaders(
   return dict;
 }
 
-export function emailMessageFromGmail(
-  gmailMessage: gmail_v1.Schema$Message
-): EmailMessage {
+export function emailMessageFromGmail(gmailMessage: gmail_v1.Schema$Message): EmailMessage {
   const headers = gmailMessage.payload?.headers ?? [];
-  const from = extractNameAndEmail(
-    headers.find((header: any) => header.name === "From")!.value!
-  );
+  const from = extractNameAndEmail(headers.find((header: any) => header.name === 'From')!.value!);
   const to = headers
-    .filter((header) => header.name === "To")
-    .map((header) => extractNameAndEmail(header.value!));
-  const subject = headers.find((header: any) => header.name === "Subject")!;
-  const date = new Date(
-    headers.find((header: any) => header.name === "Date")!.value!
-  );
+    .filter(header => header.name === 'To')
+    .map(header => extractNameAndEmail(header.value!));
+  const subject = headers.find((header: any) => header.name === 'Subject')!;
+  const date = new Date(headers.find((header: any) => header.name === 'Date')!.value!);
   const snippet = gmailMessage.snippet;
   const body = extractBody(gmailMessage.payload!)!;
   const attachments = gmailMessage.payload?.parts
@@ -70,7 +60,7 @@ export function emailMessageFromGmail(
     headers: generateDictionaryFromHeaders(headers),
     subject: subject.value!,
     timestamp: date.getTime(),
-    snippet: snippet ?? "",
+    snippet: snippet ?? '',
     mimeType: body.mimeType,
     body: body.body,
     attachments: attachments,
@@ -82,26 +72,26 @@ function extractBody(
   payload: gmail_v1.Schema$MessagePart
 ): { mimeType: string; body: string } | undefined {
   if (payload.parts) {
-    const bodyParts = payload.parts.filter((v) => v.filename == "");
-    const htmlBody = bodyParts.find((v) => v.mimeType == "text/html");
+    const bodyParts = payload.parts.filter(v => v.filename == '');
+    const htmlBody = bodyParts.find(v => v.mimeType == 'text/html');
     if (htmlBody) {
       return {
-        mimeType: "text/html",
-        body: Buffer.from(htmlBody.body!.data!, "base64").toString(),
+        mimeType: 'text/html',
+        body: Buffer.from(htmlBody.body!.data!, 'base64').toString(),
       };
     }
-    const textBody = bodyParts.find((v) => v.mimeType == "text/plain");
+    const textBody = bodyParts.find(v => v.mimeType == 'text/plain');
     if (textBody) {
       return {
-        mimeType: "text/plain",
-        body: Buffer.from(textBody.body!.data!, "base64").toString(),
+        mimeType: 'text/plain',
+        body: Buffer.from(textBody.body!.data!, 'base64').toString(),
       };
     }
   } else {
-    if (payload.filename == "" && payload.body?.data) {
+    if (payload.filename == '' && payload.body?.data) {
       return {
         mimeType: payload.mimeType!,
-        body: Buffer.from(payload.body.data, "base64").toString(),
+        body: Buffer.from(payload.body.data, 'base64').toString(),
       };
     }
   }

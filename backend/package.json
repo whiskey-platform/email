@@ -10,7 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-eventbridge": "^3.600.0",
     "@aws-sdk/client-s3": "^3.598.0",
+    "@infisical/sdk": "^2.2.3",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.31.2",
     "googleapis": "^135.0.0",
@@ -18,8 +20,10 @@
     "sst": "^3.0.13"
   },
   "devDependencies": {
+    "@tsconfig/node20": "^20.1.4",
     "@types/aws-lambda": "^8.10.137",
     "drizzle-kit": "^0.22.7",
     "typescript": "^5"
-  }
+  },
+  "type": "module"
 }

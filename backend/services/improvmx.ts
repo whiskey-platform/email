@@ -1,3 +1,5 @@
+import { getSecret } from './secrets';
+
 type ImprovMXError = {
   success: boolean; // = false
   errors: { [key: string]: string[] };
@@ -12,20 +14,23 @@ type Alias = {
 
 export class ImprovMX {
   baseUrl: string;
-  private apiKey: string;
 
   constructor() {
-    this.baseUrl = "https://api.improvmx.com/v3/";
-    this.apiKey = process.env.IMPROVMX_API_KEY!;
+    this.baseUrl = 'https://api.improvmx.com/v3/';
   }
 
+  private apiKey = async () => {
+    return (await getSecret('IMPROVMX_API_KEY')).secretValue;
+  };
+
   async getWildcardAlias(domain: string): Promise<Alias> {
+    const apiKey = await this.apiKey();
     const res = await fetch(this.baseUrl + `domains/${domain}/aliases/*`, {
       headers: {
-        Authorization: `Basic api:${this.apiKey}`,
+        Authorization: `Basic api:${apiKey}`,
       },
     });
-    const data = await res.json();
+    const data = (await res.json()) as { success: boolean; alias: Alias };
     if (data.success == true) {
       return data.alias;
     }
@@ -33,17 +38,18 @@ export class ImprovMX {
   }
 
   async updateWildcardAlias(domain: string, forward: string): Promise<Alias> {
+    const apiKey = await this.apiKey();
     const res = await fetch(this.baseUrl + `domains/${domain}/aliases/*`, {
-      method: "PUT",
+      method: 'PUT',
       headers: {
-        Authorization: `Basic api:${this.apiKey}`,
-        "Content-Type": "application/json",
+        Authorization: `Basic api:${apiKey}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         forward,
       }),
     });
-    const data = await res.json();
+    const data = (await res.json()) as { success: boolean; alias: Alias };
     if (data.success == true) {
       return data.alias;
     }

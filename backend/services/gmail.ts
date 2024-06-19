@@ -1,41 +1,24 @@
-import { google } from "googleapis";
-import { web as GoogleInfo } from "../google-oauth-info.json";
-import { db } from "./db";
-import { oauthAccounts } from "./db/schema";
-import { eq } from "drizzle-orm";
+import { google } from 'googleapis';
 
 export class Gmail {
-  private oauth2Client;
-  constructor() {
-    this.oauth2Client = new google.auth.OAuth2(
-      GoogleInfo.client_id,
-      GoogleInfo.client_secret,
-      GoogleInfo.redirect_uris[0]
-    );
-  }
+  oauth2Client;
 
-  private async authenticate() {
-    const googleClient = (
-      await db
-        .select()
-        .from(oauthAccounts)
-        .where(eq(oauthAccounts.type, "google"))
-    )[0];
+  constructor(clientId: string, clientSecret: string, accessToken: string, refreshToken: string) {
+    this.oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
     this.oauth2Client.setCredentials({
-      access_token: googleClient.accessToken,
-      refresh_token: googleClient.refreshToken,
+      access_token: accessToken,
+      refresh_token: refreshToken,
     });
   }
 
   private async listMessages(pageToken?: string) {
-    await this.authenticate();
-    const gmail = google.gmail({ version: "v1", auth: this.oauth2Client });
+    const gmail = google.gmail({ version: 'v1', auth: this.oauth2Client });
     const res = await gmail.users.messages.list({
-      userId: "me",
+      userId: 'me',
       pageToken,
     });
     const fullDetails = await Promise.all(
-      (res.data.messages || []).map(async (message) => {
+      (res.data.messages || []).map(async message => {
         return await this.getFullMessage(message.id!);
       })
     );
@@ -43,10 +26,9 @@ export class Gmail {
   }
 
   public async getFullMessage(id: string) {
-    await this.authenticate();
-    const gmail = google.gmail({ version: "v1", auth: this.oauth2Client });
+    const gmail = google.gmail({ version: 'v1', auth: this.oauth2Client });
     const res = await gmail.users.messages.get({
-      userId: "me",
+      userId: 'me',
       id,
     });
     return res.data;
@@ -62,10 +44,9 @@ export class Gmail {
   }
 
   public async watchForMessages() {
-    await this.authenticate();
-    const gmail = google.gmail({ version: "v1", auth: this.oauth2Client });
+    const gmail = google.gmail({ version: 'v1', auth: this.oauth2Client });
     await gmail.users.watch({
-      userId: "me",
+      userId: 'me',
       requestBody: {
         topicName: process.env.GMAIL_TOPIC,
       },
@@ -73,10 +54,9 @@ export class Gmail {
   }
 
   async getHistory(startHistoryId: string, pageToken?: string) {
-    await this.authenticate();
-    const gmail = google.gmail({ version: "v1", auth: this.oauth2Client });
+    const gmail = google.gmail({ version: 'v1', auth: this.oauth2Client });
     const res = await gmail.users.history.list({
-      userId: "me",
+      userId: 'me',
       startHistoryId,
       pageToken,
     });

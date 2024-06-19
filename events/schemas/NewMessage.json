@@ -1,0 +1,156 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "NewMessage",
+    "version": "1.0.0"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AWSEvent": {
+        "type": "object",
+        "required": [
+          "detail-type",
+          "resources",
+          "detail",
+          "id",
+          "source",
+          "time",
+          "region",
+          "version",
+          "account"
+        ],
+        "x-amazon-events-detail-type": "New Message",
+        "x-amazon-events-source": "whiskey.email",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/NewMessage"
+          },
+          "account": {
+            "type": "string"
+          },
+          "detail-type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "NewMessage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "to": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": ["email"]
+            }
+          },
+          "from": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["email"]
+          },
+          "headers": {
+            "type": "object"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "integer"
+          },
+          "snippet": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "inlines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "mimeType": {
+                  "type": "string"
+                },
+                "filename": {
+                  "type": "string"
+                }
+              },
+              "required": ["mimeType", "filename"]
+            }
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "mimeType": {
+                  "type": "string"
+                },
+                "filename": {
+                  "type": "string"
+                }
+              },
+              "required": ["mimeType", "filename"]
+            }
+          },
+          "refresh": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "to",
+          "from",
+          "headers",
+          "subject",
+          "timestamp",
+          "snippet",
+          "mimeType",
+          "inlines",
+          "attachments"
+        ]
+      }
+    }
+  }
+}

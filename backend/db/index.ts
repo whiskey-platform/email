@@ -1,10 +1,10 @@
-import "dotenv/config";
+import { drizzle } from 'drizzle-orm/postgres-js';
+import * as schema from './schema';
+import postgres from 'postgres';
+import { getSecret } from '../services/secrets';
 
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
-
-const connectionString = process.env.DATABASE_URL!;
-
-// Disable prefetch as it is not supported for "Transaction" pool mode
-export const client = postgres(connectionString, { prepare: false });
-export const db = drizzle(client);
+export const db = async () => {
+  const connectionString = (await getSecret('DATABASE_CONNECTION')).secretValue;
+  const client = postgres(connectionString, { prepare: false });
+  return drizzle(client, { schema });
+};

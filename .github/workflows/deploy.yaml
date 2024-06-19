@@ -1,0 +1,63 @@
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::662292074719:role/whiskey-platform-org-oidc-Role-1USEMBRRC7INX
+          role-session-name: whiskey-email
+
+      - name: Configure GCP Credentials
+        uses: 'google-github-actions/auth@v2'
+        with:
+          create_credentials_file: true
+          workload_identity_provider: 'projects/402865439291/locations/global/workloadIdentityPools/whiskey-platform/providers/github-actions'
+          service_account: 'sst-21@mattwyskiel-com.iam.gserviceaccount.com'
+      - name: Install SST
+        run: curl -fsSL https://ion.sst.dev/install | bash
+      - run: sst install
+        env:
+          NO_BUN: true
+      - run: sst deploy --stage=production
+        env:
+          NO_BUN: true

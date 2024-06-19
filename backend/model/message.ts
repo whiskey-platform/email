@@ -14,14 +14,28 @@ export type EmailMessage = {
     mimeType: string;
     data: string;
   }[];
+  attachments: { filename: string; mimeType: string; data: string }[] | undefined;
+};
+
+export type EmailMessageMetadata = Omit<
+  Omit<Omit<EmailMessage, 'body'>, 'attachments'>,
+  'inlines'
+> & {
   attachments:
-    | { filename: string; mimeType: string; data: string }[]
+    | {
+        filename: string;
+        mimeType: string;
+      }[]
+    | undefined;
+  inlines:
+    | {
+        filename: string;
+        mimeType: string;
+      }[]
     | undefined;
 };
 
-export const messageMeta = (
-  message: EmailMessage
-): Omit<Omit<Omit<EmailMessage, "body">, "attachments">, "inlines"> => {
+export const messageMeta = (message: EmailMessage): EmailMessageMetadata => {
   return {
     id: message.id,
     headers: message.headers,
@@ -31,5 +45,17 @@ export const messageMeta = (
     timestamp: message.timestamp,
     snippet: message.snippet,
     mimeType: message.mimeType,
+    attachments: message.attachments?.map(attachment => {
+      return {
+        filename: attachment.filename,
+        mimeType: attachment.mimeType,
+      };
+    }),
+    inlines: message.inlines.map(inline => {
+      return {
+        filename: inline.filename,
+        mimeType: inline.mimeType,
+      };
+    }),
   };
 };
