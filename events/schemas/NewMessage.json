@@ -91,7 +91,9 @@
           },
           "headers": {
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": {
+              "type": "string"
+            }
           },
           "subject": {
             "type": "string"
