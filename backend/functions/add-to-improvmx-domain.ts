@@ -1,9 +1,10 @@
 import { Handler } from 'aws-lambda';
 import { ImprovMX } from '../services/improvmx';
 
+const improvmx = new ImprovMX();
+
 export const handler: Handler = async event => {
   console.log('event', event);
-  const improvmx = new ImprovMX();
   const payload = JSON.parse(event.body ?? '{}');
   const webhook = payload['webhook'];
   const wildcardAlias = await improvmx.getWildcardAlias('mattwyskiel.com');

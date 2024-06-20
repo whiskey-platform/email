@@ -26,12 +26,6 @@ export default $config({
       transform: {
         route: {
           handler: {
-            permissions: [
-              {
-                actions: ['events:PutEvents'],
-                resources: [eventBus.arn],
-              },
-            ],
             link: [bucket],
           },
         },
@@ -46,20 +40,13 @@ export default $config({
       content: readFileSync('./events/schemas/NewMessage.json', 'utf8'),
     });
 
-    const improvmx = api.route(
-      'POST /improvmx-webhook',
-      'backend/functions/improvmx-webhook.handler'
-    );
-    bucket.subscribe('backend/functions/on-improvmx-message-add.handler', {
-      events: ['s3:ObjectCreated:*'],
-      filterPrefix: 'raw/improvmx/',
-    });
+    api.route('POST /improvmx-webhook', 'backend/functions/improvmx-webhook.handler');
 
     const addToImprovMXDomain = new sst.aws.Function('AddToImprovMXDomain', {
       handler: 'backend/functions/add-to-improvmx-domain.handler',
     });
     new command.local.Command('ExecuteAdd', {
-      create: `aws lambda invoke --function-name "$FN" --payload '{"webhook": "$WEBHOOK_URL"}'`,
+      create: `aws lambda invoke --function-name "$FN" --payload '{"webhook": "$WEBHOOK_URL"}' --cli-binary-format raw-in-base64-out out.txt >/dev/null && cat out.txt | tr -d '"'  && rm out.txt`,
       environment: {
         FN: addToImprovMXDomain.arn,
         WEBHOOK_URL: api.url.apply(url => `${url}/improvmx-webhook`),
@@ -74,7 +61,7 @@ export default $config({
         pushEndpoint: api.url.apply(url => `${url}/gmail-webhook`),
       },
     });
-    const gmailWatchCron = new sst.aws.Cron(
+    new sst.aws.Cron(
       'GmailWatchCron',
       {
         schedule: 'rate(1 day)',
@@ -88,9 +75,41 @@ export default $config({
       { dependsOn: [gmailSubscription] }
     );
 
-    bucket.subscribe('backend/functions/on-gmail-message-add.handler', {
-      events: ['s3:ObjectCreated:*'],
-      filterPrefix: 'raw/gmail/',
+    const onGmailMessageAdd = new sst.aws.Function('GmailMessageAdd', {
+      handler: 'backend/functions/on-gmail-message-add.handler',
+      permissions: [
+        {
+          actions: ['events:PutEvents'],
+          resources: [eventBus.arn],
+        },
+      ],
+      link: [bucket],
     });
+    const onImprovmxMessageAdd = new sst.aws.Function('ImprovmxMessageAdd', {
+      handler: 'backend/functions/on-improvmx-message-add.handler',
+      permissions: [
+        {
+          actions: ['events:PutEvents'],
+          resources: [eventBus.arn],
+        },
+      ],
+      link: [bucket],
+    });
+    bucket.subscribe(
+      {
+        handler: 'backend/functions/s3-notifications-handler.handler',
+        environment: {
+          GMAIL_FUNCTION: onGmailMessageAdd.arn,
+          IMPROVMX_FUNCTION: onImprovmxMessageAdd.arn,
+        },
+        permissions: [
+          {
+            actions: ['lambda:InvokeFunction'],
+            resources: [onGmailMessageAdd.arn, onImprovmxMessageAdd.arn],
+          },
+        ],
+      },
+      { events: ['s3:ObjectCreated:*'] }
+    );
   },
 });

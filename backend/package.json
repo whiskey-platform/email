@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-eventbridge": "^3.600.0",
+    "@aws-sdk/client-lambda": "^3.600.0",
     "@aws-sdk/client-s3": "^3.598.0",
     "@infisical/sdk": "^2.2.3",
     "dotenv": "^16.4.5",
