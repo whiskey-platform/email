@@ -14,6 +14,12 @@ export default $config({
     };
   },
   async run() {
+    $transform(sst.aws.Function, (args, opts) => {
+      args.nodejs = {
+        install: ['@infisical/sdk'],
+      };
+    });
+
     const bucket = new sst.aws.Bucket('EmailBucket');
     const eventBus = aws.cloudwatch.EventBus.get('EventBus', 'whiskey-event-bus');
     const api = new sst.aws.ApiGatewayV2('EmailApi', {
