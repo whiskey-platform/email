@@ -1,3 +1,5 @@
+import { logger } from './logging';
+
 type ImprovMXError = {
   success: boolean; // = false
   errors: { [key: string]: string[] };
@@ -20,7 +22,8 @@ export class ImprovMX {
   }
 
   async getWildcardAlias(domain: string): Promise<Alias> {
-    const apiKey = await this.apiKey;
+    logger.info(`Getting wildcard alias info for domain: ${domain}`);
+    const apiKey = this.apiKey;
     const res = await fetch(this.baseUrl + `domains/${domain}/aliases/*`, {
       headers: {
         Authorization: `Basic api:${apiKey}`,
@@ -28,13 +31,15 @@ export class ImprovMX {
     });
     const data = (await res.json()) as { success: boolean; alias: Alias };
     if (data.success == true) {
+      logger.info(`Successfully retrieved wildcard alias info for domain: ${domain}`);
       return data.alias;
     }
     throw data;
   }
 
   async updateWildcardAlias(domain: string, forward: string): Promise<Alias> {
-    const apiKey = await this.apiKey;
+    logger.info(`Updating wildcard alias for domain: ${domain}`);
+    const apiKey = this.apiKey;
     const res = await fetch(this.baseUrl + `domains/${domain}/aliases/*`, {
       method: 'PUT',
       headers: {
@@ -47,6 +52,7 @@ export class ImprovMX {
     });
     const data = (await res.json()) as { success: boolean; alias: Alias };
     if (data.success == true) {
+      logger.info(`Successfully updated wildcard alias for domain: ${domain}`);
       return data.alias;
     }
     throw data;

@@ -18,6 +18,10 @@ export default $config({
       args.nodejs = {
         install: ['@infisical/sdk'],
       };
+      args.environment = {
+        ...args.environment,
+        POWERTOOLS_SERVICE_NAME: 'whiskey.email',
+      };
     });
 
     const bucket = new sst.aws.Bucket('EmailBucket');

@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import { logger } from './logging';
 
 export class Gmail {
   oauth2Client;
@@ -12,6 +13,8 @@ export class Gmail {
   }
 
   private async listMessages(pageToken?: string) {
+    logger.info('Listing messages');
+    logger.info(`Page token: ${pageToken}`);
     const gmail = google.gmail({ version: 'v1', auth: this.oauth2Client });
     const res = await gmail.users.messages.list({
       userId: 'me',
@@ -22,15 +25,18 @@ export class Gmail {
         return await this.getFullMessage(message.id!);
       })
     );
+    logger.info('Successfully retrieved messages');
     return { messages: fullDetails, pageToken: res.data.nextPageToken };
   }
 
   public async getFullMessage(id: string) {
+    logger.info(`Getting full message details for message: ${id}`);
     const gmail = google.gmail({ version: 'v1', auth: this.oauth2Client });
     const res = await gmail.users.messages.get({
       userId: 'me',
       id,
     });
+    logger.info(`Successfully retrieved full message details for message: ${id}`);
     return res.data;
   }
 
@@ -44,6 +50,7 @@ export class Gmail {
   }
 
   public async watchForMessages() {
+    logger.info('Alerting Google Pub/Sub to watch for messages');
     const gmail = google.gmail({ version: 'v1', auth: this.oauth2Client });
     await gmail.users.watch({
       userId: 'me',
@@ -51,15 +58,19 @@ export class Gmail {
         topicName: process.env.GMAIL_TOPIC,
       },
     });
+    logger.info('Successfully sent WATCH request to Gmail');
   }
 
   async getHistory(startHistoryId: string, pageToken?: string) {
+    logger.info(`Getting history starting from historyId: ${startHistoryId}`);
+    logger.info(`Page token: ${pageToken}`);
     const gmail = google.gmail({ version: 'v1', auth: this.oauth2Client });
     const res = await gmail.users.history.list({
       userId: 'me',
       startHistoryId,
       pageToken,
     });
+    logger.info(`Successfully retrieved history`);
     return {
       history: res.data.history ?? [],
       nextPageToken: res.data.nextPageToken,
