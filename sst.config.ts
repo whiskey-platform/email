@@ -58,6 +58,11 @@ export default $config({
     });
 
     const gmailTopic = new gcp.pubsub.Topic('GmailTopic');
+    new gcp.pubsub.TopicIAMBinding('binding', {
+      topic: gmailTopic.id,
+      role: 'roles/pubsub.publisher',
+      members: ['serviceAccount:gmail-api-push@system.gserviceaccount.com'],
+    });
     api.route('POST /gmail-webhook', 'backend/functions/gmail-webhook.handler');
     const gmailSubscription = new gcp.pubsub.Subscription('GmailWebhookSubscription', {
       topic: gmailTopic.id,
