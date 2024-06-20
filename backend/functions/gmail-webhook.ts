@@ -41,7 +41,7 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
   const dbClient = await db();
   logger.info('Getting Gmail account info');
   const result = await dbClient.query.oauthAccounts.findFirst({
-    where: eq(oauthAccounts.type, 'gmail'),
+    where: eq(oauthAccounts.type, 'google'),
   });
   if (!result) {
     logger.error('No Gmail account found');
