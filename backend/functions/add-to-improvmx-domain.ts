@@ -6,8 +6,7 @@ export const handler: Handler = async event => {
   const secrets = new Secrets();
   const improvmxApiKey = await secrets.get('IMPROVMX_API_KEY');
   const improvmx = new ImprovMX(improvmxApiKey);
-  const payload = JSON.parse(event.body ?? '{}');
-  const webhook = payload['webhook'];
+  const webhook = event['webhook'];
   const wildcardAlias = await improvmx.getWildcardAlias('mattwyskiel.com');
 
   if (!wildcardAlias.forward.split(',').includes(webhook)) {
