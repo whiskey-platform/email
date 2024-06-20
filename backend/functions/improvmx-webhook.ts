@@ -10,7 +10,7 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
   logger.info(`Saving ImprovMX message to S3: ${payload['message-id']}`);
   const command = new PutObjectCommand({
     Bucket: Resource.EmailBucket.name,
-    Key: `raw/improvmx/${payload['message-id']}.json`,
+    Key: `raw/improvmx/${payload['timestamp']}.json`,
     Body: event.body,
   });
   const res = await s3.send(command);
@@ -19,7 +19,7 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
     statusCode: 200,
     body: JSON.stringify({
       message: 'success',
-      path: `raw/improvmx/${payload['message-id']}.json`,
+      path: `raw/improvmx/${payload['timestamp']}.json`,
     }),
   };
 };

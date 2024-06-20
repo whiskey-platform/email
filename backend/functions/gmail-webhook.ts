@@ -74,6 +74,8 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
           await s3.send(command);
           logger.info(`Successfully saved message to S3: ${message.id}`);
           paths.push(`raw/gmail/${message.id}.json`);
+        } else {
+          logger.info(`Skipping @mattwyskiel.com message: ${message.id}`);
         }
       });
     }

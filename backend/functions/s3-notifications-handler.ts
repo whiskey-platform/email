@@ -17,7 +17,7 @@ export const handler: S3Handler = async event => {
       await lambda.send(
         new InvokeCommand({
           FunctionName: gmailFunction,
-          Payload: JSON.stringify({ key }),
+          Payload: JSON.stringify(event),
           InvocationType: InvocationType.Event,
         })
       );
@@ -28,7 +28,7 @@ export const handler: S3Handler = async event => {
       await lambda.send(
         new InvokeCommand({
           FunctionName: improvmxFunction,
-          Payload: JSON.stringify({ key }),
+          Payload: JSON.stringify(event),
           InvocationType: InvocationType.Event,
         })
       );
