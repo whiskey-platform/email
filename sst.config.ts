@@ -58,7 +58,7 @@ export default $config({
     });
 
     const gmailTopic = new gcp.pubsub.Topic('GmailTopic');
-    new gcp.pubsub.TopicIAMBinding('binding', {
+    new gcp.pubsub.TopicIAMBinding('GmailTopicBinding', {
       topic: gmailTopic.id,
       role: 'roles/pubsub.publisher',
       members: ['serviceAccount:gmail-api-push@system.gserviceaccount.com'],
