@@ -58,7 +58,7 @@ export default $config({
     const addToImprovMXDomain = new sst.aws.Function('AddToImprovMXDomain', {
       handler: 'backend/functions/add-to-improvmx-domain.handler',
     });
-    new command.local.Command('executeAdd', {
+    new command.local.Command('ExecuteAdd', {
       create: `aws lambda invoke --function-name "$FN" --payload '{"webhook": "$WEBHOOK_URL"}'`,
       environment: {
         FN: addToImprovMXDomain.arn,
