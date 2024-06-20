@@ -1,9 +1,11 @@
 import { Handler } from 'aws-lambda';
 import { ImprovMX } from '../services/improvmx';
-
-const improvmx = new ImprovMX();
+import { Secrets } from '../services/secrets';
 
 export const handler: Handler = async event => {
+  const secrets = new Secrets();
+  const improvmxApiKey = await secrets.get('IMPROVMX_API_KEY');
+  const improvmx = new ImprovMX(improvmxApiKey);
   console.log('event', event);
   const payload = JSON.parse(event.body ?? '{}');
   const webhook = payload['webhook'];

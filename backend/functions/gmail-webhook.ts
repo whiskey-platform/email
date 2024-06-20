@@ -2,7 +2,7 @@ import { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Gmail } from '../services/gmail';
 import { Resource } from 'sst';
-import { getSecret } from '../services/secrets';
+import { Secrets } from '../services/secrets';
 import { db } from '../db';
 import { eq } from 'drizzle-orm';
 import { oauthAccounts } from '../db/schema';
@@ -30,12 +30,13 @@ type GmailWebhookBodyData = {
 const s3 = new S3Client({ region: 'us-east-1' });
 
 export const handler: APIGatewayProxyHandlerV2 = async event => {
+  const secrets = new Secrets();
   const body: GmailWebhookBody = JSON.parse(event.body ?? '{}');
   const data: GmailWebhookBodyData = JSON.parse(
     Buffer.from(body.message.data, 'base64').toString()
   );
-  const clientId = await getSecret('GOOGLE_CLIENT_ID');
-  const clientSecret = await getSecret('GOOGLE_CLIENT_SECRET');
+  const clientId = await secrets.get('GOOGLE_CLIENT_ID');
+  const clientSecret = await secrets.get('GOOGLE_CLIENT_SECRET');
   const dbClient = await db();
   const result = await dbClient.query.oauthAccounts.findFirst({
     where: eq(oauthAccounts.type, 'gmail'),
@@ -43,12 +44,7 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
   if (!result) {
     throw new Error('No Gmail account found');
   }
-  const gmail = new Gmail(
-    clientId.secretValue,
-    clientSecret.secretValue,
-    result.accessToken!,
-    result.refreshToken!
-  );
+  const gmail = new Gmail(clientId, clientSecret, result.accessToken!, result.refreshToken!);
   const history = await gmail.getFullHistory(data.historyId);
   const paths: string[] = [];
   history.forEach(async historyItem => {

@@ -1,5 +1,3 @@
-import { getSecret } from './secrets';
-
 type ImprovMXError = {
   success: boolean; // = false
   errors: { [key: string]: string[] };
@@ -14,17 +12,15 @@ type Alias = {
 
 export class ImprovMX {
   baseUrl: string;
+  apiKey: string;
 
-  constructor() {
+  constructor(apiKey: string) {
     this.baseUrl = 'https://api.improvmx.com/v3/';
+    this.apiKey = apiKey;
   }
 
-  private apiKey = async () => {
-    return (await getSecret('IMPROVMX_API_KEY')).secretValue;
-  };
-
   async getWildcardAlias(domain: string): Promise<Alias> {
-    const apiKey = await this.apiKey();
+    const apiKey = await this.apiKey;
     const res = await fetch(this.baseUrl + `domains/${domain}/aliases/*`, {
       headers: {
         Authorization: `Basic api:${apiKey}`,
@@ -38,7 +34,7 @@ export class ImprovMX {
   }
 
   async updateWildcardAlias(domain: string, forward: string): Promise<Alias> {
-    const apiKey = await this.apiKey();
+    const apiKey = await this.apiKey;
     const res = await fetch(this.baseUrl + `domains/${domain}/aliases/*`, {
       method: 'PUT',
       headers: {
