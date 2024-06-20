@@ -54,7 +54,9 @@ export class ImprovMX {
     if (data.success == true) {
       logger.info(`Successfully updated wildcard alias for domain: ${domain}`);
       return data.alias;
+    } else {
+      logger.error(`Failed to update wildcard alias for domain: ${domain}`, data);
+      throw data;
     }
-    throw data;
   }
 }
