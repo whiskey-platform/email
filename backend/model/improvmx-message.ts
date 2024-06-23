@@ -46,12 +46,12 @@ export function emailMessageFromImprovmx(improvmxMessage: ImprovMXMessage): Emai
       improvmxMessage.html && improvmxMessage.html !== ''
         ? improvmxMessage.html
         : improvmxMessage.text,
-    attachments: improvmxMessage.attachments.map(attachment => ({
+    attachments: (improvmxMessage.attachments ?? []).map(attachment => ({
       filename: attachment.name,
       mimeType: attachment.type,
       data: attachment.content,
     })),
-    inlines: improvmxMessage.inlines.map(inline => ({
+    inlines: (improvmxMessage.inlines ?? []).map(inline => ({
       filename: inline.name,
       mimeType: inline.type,
       data: inline.content,
