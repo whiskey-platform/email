@@ -52,13 +52,14 @@ export class Gmail {
   public async watchForMessages() {
     logger.info('Alerting Google Pub/Sub to watch for messages');
     const gmail = google.gmail({ version: 'v1', auth: this.oauth2Client });
-    await gmail.users.watch({
+    const res = await gmail.users.watch({
       userId: 'me',
       requestBody: {
         topicName: process.env.GMAIL_TOPIC,
       },
     });
     logger.info('Successfully sent WATCH request to Gmail');
+    return res.data;
   }
 
   async getHistory(startHistoryId: string, pageToken?: string) {

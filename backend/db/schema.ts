@@ -7,3 +7,8 @@ export const oauthAccounts = pgTable('oauth_accounts', {
   refreshToken: text('refresh_token'),
   connectionDate: date('connection_date'),
 });
+
+export const googleAccountDetails = pgTable('google_account_details', {
+  loginId: text('login_id').primaryKey(),
+  lastHistoryId: text('last_history_id'),
+});

@@ -5,7 +5,7 @@ import { Resource } from 'sst';
 import { Secrets } from '../services/secrets';
 import { db } from '../db';
 import { eq } from 'drizzle-orm';
-import { oauthAccounts } from '../db/schema';
+import { googleAccountDetails, oauthAccounts } from '../db/schema';
 import { logger } from '../services/logging';
 
 type GmailWebhookBody = {
@@ -40,16 +40,24 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
   const clientSecret = await secrets.get('GOOGLE_CLIENT_SECRET');
   const dbClient = await db();
   logger.info('Getting Gmail account info');
-  const result = await dbClient.query.oauthAccounts.findFirst({
+  const oauthResult = await dbClient.query.oauthAccounts.findFirst({
     where: eq(oauthAccounts.type, 'google'),
   });
-  if (!result) {
+  if (!oauthResult) {
     logger.error('No Gmail account found');
     throw Error('No Gmail account found');
   }
   logger.info('Successfully retrieved Gmail account details');
-  const gmail = new Gmail(clientId, clientSecret, result.accessToken!, result.refreshToken!);
-  const history = await gmail.getFullHistory(data.historyId);
+  const gmail = new Gmail(
+    clientId,
+    clientSecret,
+    oauthResult.accessToken!,
+    oauthResult.refreshToken!
+  );
+  const lastHistory = await dbClient.query.googleAccountDetails.findFirst({
+    where: eq(googleAccountDetails.loginId, oauthResult.loginId),
+  });
+  const history = await gmail.getFullHistory(lastHistory.lastHistoryId);
   const paths: string[] = [];
   history.forEach(async historyItem => {
     if (historyItem.messagesAdded) {
@@ -80,6 +88,14 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
       });
     }
   });
+  await dbClient
+    .insert(googleAccountDetails)
+    .values({ loginId: oauthResult.loginId, lastHistoryId: data.historyId })
+    .onConflictDoUpdate({
+      target: googleAccountDetails.loginId,
+      set: { lastHistoryId: data.historyId },
+    });
+
   return {
     statusCode: 200,
     body: JSON.stringify({ message: 'success', paths }),

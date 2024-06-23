@@ -3,7 +3,7 @@ import { Gmail } from '../services/gmail';
 import { Secrets } from '../services/secrets';
 import { db } from '../db';
 import { eq } from 'drizzle-orm';
-import { oauthAccounts } from '../db/schema';
+import { googleAccountDetails, oauthAccounts } from '../db/schema';
 import { logger } from '../services/logging';
 
 export const handler: Handler = async event => {
@@ -21,5 +21,12 @@ export const handler: Handler = async event => {
   }
   logger.info('Successfully retrieved Gmail account details');
   const gmail = new Gmail(clientId, clientSecret, result.accessToken!, result.refreshToken!);
-  await gmail.watchForMessages();
+  const res = await gmail.watchForMessages();
+  await dbClient
+    .insert(googleAccountDetails)
+    .values({ loginId: result.loginId, lastHistoryId: res.historyId })
+    .onConflictDoUpdate({
+      target: googleAccountDetails.loginId,
+      set: { lastHistoryId: res.historyId },
+    });
 };
