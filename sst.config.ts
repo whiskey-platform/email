@@ -104,21 +104,25 @@ export default $config({
       ],
       link: [bucket],
     });
-    bucket.subscribe(
+    const bucketSubscriber = bucket.subscribe(
       {
         handler: 'backend/functions/s3-notifications-handler.handler',
         environment: {
           GMAIL_FUNCTION: onGmailMessageAdd.arn,
           IMPROVMX_FUNCTION: onImprovmxMessageAdd.arn,
         },
-        permissions: [
-          {
-            actions: ['lambda:InvokeFunction'],
-            resources: [onGmailMessageAdd.arn, onImprovmxMessageAdd.arn],
-          },
-        ],
+        link: [onGmailMessageAdd, onImprovmxMessageAdd],
       },
       { events: ['s3:ObjectCreated:*'] }
     );
+
+    // Housekeeping
+    const reloadRaw = new sst.aws.Function('ReloadRawEmails', {
+      handler: 'backend/functions/housekeeping/reload-raw.handler',
+      link: [bucket, bucketSubscriber.nodes.function],
+      environment: {
+        SUBSCRIBER_FUNCTION_ARN: bucketSubscriber.nodes.function.arn,
+      },
+    });
   },
 });

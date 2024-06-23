@@ -16,7 +16,16 @@ export class S3 {
     });
     const res = await this.s3.send(command);
     logger.info(`Successfully retrieved raw email from S3: ${key}`);
-    return JSON.parse((await res.Body?.transformToString()) ?? '{}');
+    if (!res.Body) {
+      logger.error('No body in S3 response');
+      return {};
+    }
+    const jsonString = await res.Body?.transformToString();
+    if (!jsonString) {
+      logger.error('Failed to transform body to string');
+      return {};
+    }
+    return JSON.parse(jsonString);
   }
   async uploadEmailMessage(message: EmailMessage) {
     // generate meta.json
