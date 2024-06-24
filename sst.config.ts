@@ -15,6 +15,11 @@ export default $config({
   },
   async run() {
     $transform(sst.aws.Function, (args, opts) => {
+      args.nodejs = {
+        esbuild: {
+          external: ['@aws-sdk/*'],
+        },
+      };
       args.environment = {
         ...args.environment,
         POWERTOOLS_SERVICE_NAME: 'whiskey.email',
