@@ -57,6 +57,9 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
     where: eq(googleAccountDetails.loginId, oauthResult.loginId),
   });
   const history = await gmail.getFullHistory(lastHistory.lastHistoryId);
+  if (history.length === 0) {
+    logger.info('No new messages');
+  }
   const paths: string[] = [];
   for (const historyItem of history) {
     if (historyItem.messagesAdded) {
