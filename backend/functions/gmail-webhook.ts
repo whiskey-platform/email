@@ -28,9 +28,8 @@ type GmailWebhookBodyData = {
   historyId: string;
 };
 
-const s3 = new S3Client({ region: 'us-east-1' });
-
 export const handler: APIGatewayProxyHandlerV2 = async event => {
+  const s3 = new S3Client({ region: 'us-east-1' });
   const secrets = new Secrets();
   const body: GmailWebhookBody = JSON.parse(event.body ?? '{}');
   const data: GmailWebhookBodyData = JSON.parse(

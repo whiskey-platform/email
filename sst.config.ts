@@ -86,34 +86,16 @@ export default $config({
       { dependsOn: [gmailSubscription] }
     );
 
-    const onGmailMessageAdd = new sst.aws.Function('GmailMessageAdd', {
-      handler: 'backend/functions/on-gmail-message-add.handler',
-      permissions: [
-        {
-          actions: ['events:PutEvents'],
-          resources: [eventBus.arn],
-        },
-      ],
-      link: [bucket],
-    });
-    const onImprovmxMessageAdd = new sst.aws.Function('ImprovmxMessageAdd', {
-      handler: 'backend/functions/on-improvmx-message-add.handler',
-      permissions: [
-        {
-          actions: ['events:PutEvents'],
-          resources: [eventBus.arn],
-        },
-      ],
-      link: [bucket],
-    });
     const bucketSubscriber = bucket.subscribe(
       {
         handler: 'backend/functions/s3-notifications-handler.handler',
-        environment: {
-          GMAIL_FUNCTION: onGmailMessageAdd.arn,
-          IMPROVMX_FUNCTION: onImprovmxMessageAdd.arn,
-        },
-        link: [onGmailMessageAdd, onImprovmxMessageAdd],
+        permissions: [
+          {
+            actions: ['events:PutEvents'],
+            resources: [eventBus.arn],
+          },
+        ],
+        link: [bucket],
       },
       { events: ['s3:ObjectCreated:*'] }
     );

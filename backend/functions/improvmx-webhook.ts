@@ -3,9 +3,8 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Resource } from 'sst';
 import { logger } from '../services/logging';
 
-const s3 = new S3Client({ region: 'us-east-1' });
-
 export const handler: APIGatewayProxyHandlerV2 = async event => {
+  const s3 = new S3Client({ region: 'us-east-1' });
   const payload = JSON.parse(event.body ?? '{}');
   logger.info(`Saving ImprovMX message to S3: ${payload['message-id']}`);
   const command = new PutObjectCommand({
