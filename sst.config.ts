@@ -15,9 +15,6 @@ export default $config({
   },
   async run() {
     $transform(sst.aws.Function, (args, opts) => {
-      args.nodejs = {
-        install: ['@infisical/sdk'],
-      };
       args.environment = {
         ...args.environment,
         POWERTOOLS_SERVICE_NAME: 'whiskey.email',
