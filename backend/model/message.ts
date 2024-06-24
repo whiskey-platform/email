@@ -12,9 +12,12 @@ export type EmailMessage = {
   inlines: {
     filename: string;
     mimeType: string;
+    encoding?: string;
     data: string;
   }[];
-  attachments: { filename: string; mimeType: string; data: string }[] | undefined;
+  attachments:
+    | { filename: string; mimeType: string; data: string; encoding?: string }[]
+    | undefined;
 };
 
 export type EmailMessageMetadata = Omit<

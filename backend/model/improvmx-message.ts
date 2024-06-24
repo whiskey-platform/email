@@ -18,12 +18,13 @@ type ImprovMXMessage = {
     name: string;
     content: string;
     cid: string;
+    encoding?: string;
   }[];
   attachments: {
     type: string;
     name: string;
     content: string;
-    encoding: string;
+    encoding?: string;
   }[];
 };
 
@@ -50,11 +51,13 @@ export function emailMessageFromImprovmx(improvmxMessage: ImprovMXMessage): Emai
       filename: attachment.name,
       mimeType: attachment.type,
       data: attachment.content,
+      encoding: attachment.encoding,
     })),
     inlines: (improvmxMessage.inlines ?? []).map(inline => ({
       filename: inline.name,
       mimeType: inline.type,
       data: inline.content,
+      encoding: inline.encoding,
     })),
   };
 }

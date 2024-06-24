@@ -7,7 +7,10 @@ const s3 = new S3Client({});
 const lambda = new LambdaClient({ region: 'us-east-1' });
 
 export const handler: Handler = async _event => {
-  const paginator = paginateListObjectsV2({ client: s3 }, { Bucket: Resource.EmailBucket.name });
+  const paginator = paginateListObjectsV2(
+    { client: s3 },
+    { Bucket: Resource.EmailBucket.name, Prefix: 'raw/' }
+  );
   const files: _Object[] = [];
   for await (const page of paginator) {
     files.push(...page.Contents);

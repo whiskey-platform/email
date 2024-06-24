@@ -51,10 +51,14 @@ export class S3 {
     // generate attachments
     logger.info('Generating attachments');
     for (const attachment of message.attachments || []) {
+      let data: any = attachment.data;
+      if (attachment.encoding === 'base64') {
+        data = Buffer.from(attachment.data, 'base64');
+      }
       const attachmentCommand = new PutObjectCommand({
         Bucket: Resource.EmailBucket.name,
         Key: `messages/${message.id}/attachments/${attachment.filename}`,
-        Body: attachment.data,
+        Body: data,
         ContentType: attachment.mimeType,
       });
       await this.s3.send(attachmentCommand);
@@ -63,10 +67,14 @@ export class S3 {
     // generate inlines
     logger.info('Generating inlines');
     for (const inline of message.inlines || []) {
+      let data: any = inline.data;
+      if (inline.encoding === 'base64') {
+        data = Buffer.from(inline.data, 'base64');
+      }
       const inlineCommand = new PutObjectCommand({
         Bucket: Resource.EmailBucket.name,
         Key: `messages/${message.id}/inlines/${inline.filename}`,
-        Body: inline.data,
+        Body: data,
         ContentType: inline.mimeType,
       });
       await this.s3.send(inlineCommand);
