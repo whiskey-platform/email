@@ -36,6 +36,10 @@ export class Secrets {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
+        params: {
+          workspaceId: '1042cd74-dfae-4ab0-8fb2-7e0fc04d5f1c',
+          environment: 'prod',
+        },
       }
     );
     logger.info(`Successfully retrieved secret value for key: ${key}`);
