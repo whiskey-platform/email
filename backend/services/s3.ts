@@ -50,7 +50,7 @@ export class S3 {
     logger.info(`Successfully uploaded body.${extensionFromMimeType(message.mimeType)}`);
     // generate attachments
     logger.info('Generating attachments');
-    message.attachments?.forEach(async attachment => {
+    for (const attachment of message.attachments || []) {
       const attachmentCommand = new PutObjectCommand({
         Bucket: Resource.EmailBucket.name,
         Key: `messages/${message.id}/attachments/${attachment.filename}`,
@@ -59,10 +59,10 @@ export class S3 {
       });
       await this.s3.send(attachmentCommand);
       logger.info(`Successfully uploaded attachment: ${attachment.filename}`);
-    });
+    }
     // generate inlines
     logger.info('Generating inlines');
-    message.inlines?.forEach(async inline => {
+    for (const inline of message.inlines || []) {
       const inlineCommand = new PutObjectCommand({
         Bucket: Resource.EmailBucket.name,
         Key: `messages/${message.id}/inlines/${inline.filename}`,
@@ -71,7 +71,7 @@ export class S3 {
       });
       await this.s3.send(inlineCommand);
       logger.info(`Successfully uploaded inline: ${inline.filename}`);
-    });
+    }
   }
 }
 

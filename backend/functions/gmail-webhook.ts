@@ -58,7 +58,7 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
   });
   const history = await gmail.getFullHistory(lastHistory.lastHistoryId);
   const paths: string[] = [];
-  history.forEach(async historyItem => {
+  for (const historyItem of history) {
     if (historyItem.messagesAdded) {
       const messages = await Promise.all(
         historyItem.messagesAdded.map(async message => {
@@ -66,7 +66,7 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
         })
       );
       // save to s3
-      messages.forEach(async message => {
+      for (const message of messages) {
         if (
           !message.payload?.headers?.find(
             header => header.name === 'To' && header.value!.includes('@mattwyskiel.com')
@@ -84,9 +84,9 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
         } else {
           logger.info(`Skipping @mattwyskiel.com message: ${message.id}`);
         }
-      });
+      }
     }
-  });
+  }
   await dbClient
     .insert(googleAccountDetails)
     .values({ loginId: oauthResult.loginId, lastHistoryId: data.historyId })
