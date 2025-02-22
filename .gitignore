@@ -7,3 +7,5 @@ node_modules/
 *.local
 
 google-oauth-info.json
+
+.npmrc

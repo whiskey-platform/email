@@ -1,4 +1,4 @@
-import { logger } from './logging';
+import { logger } from "@whiskey-platform/logging";
 
 type ImprovMXError = {
   success: boolean; // = false

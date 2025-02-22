@@ -1,10 +1,10 @@
 import { Handler } from 'aws-lambda';
 import { Gmail } from '../services/gmail';
-import { Secrets } from '../services/secrets';
 import { db } from '../db';
 import { eq } from 'drizzle-orm';
 import { googleAccountDetails, oauthAccounts } from '../db/schema';
-import { logger } from '../services/logging';
+import { Secrets } from '@whiskey-platform/secrets';
+import { logger } from '@whiskey-platform/logging';
 
 export const handler: Handler = async event => {
   const secrets = new Secrets();

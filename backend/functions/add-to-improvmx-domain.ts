@@ -1,6 +1,6 @@
 import { Handler } from 'aws-lambda';
 import { ImprovMX } from '../services/improvmx';
-import { Secrets } from '../services/secrets';
+import { Secrets } from '@whiskey-platform/secrets';
 
 export const handler: Handler = async event => {
   const secrets = new Secrets();

@@ -1,5 +1,5 @@
+import { logger } from '@whiskey-platform/logging';
 import { google } from 'googleapis';
-import { logger } from './logging';
 
 export class Gmail {
   oauth2Client;

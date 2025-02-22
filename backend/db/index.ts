@@ -1,8 +1,8 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import * as schema from './schema';
 import postgres from 'postgres';
-import { Secrets } from '../services/secrets';
-import { logger } from '../services/logging';
+import { Secrets } from '@whiskey-platform/secrets';
+import { logger } from '@whiskey-platform/logging';
 
 export const db = async () => {
   const secrets = new Secrets();

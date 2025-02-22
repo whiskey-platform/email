@@ -1,7 +1,7 @@
 import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { EmailMessage } from '../model/message';
 import { Resource } from 'sst';
-import { logger } from './logging';
+import { logger } from '@whiskey-platform/logging';
 
 export class S3 {
   s3: S3Client;

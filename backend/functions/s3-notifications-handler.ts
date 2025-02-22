@@ -1,10 +1,10 @@
 import { S3Handler } from 'aws-lambda';
-import { logger } from '../services/logging';
 import { S3 } from '../services/s3';
 import { emailMessageFromImprovmx } from '../model/improvmx-message';
 import { EventBridge } from '../services/eventbridge';
 import { EmailMessage, messageMeta } from '../model/message';
 import { emailMessageFromGmail } from '../model/gmail-message';
+import { logger } from '@whiskey-platform/logging';
 
 export const handler: S3Handler = async event => {
   const s3 = new S3();

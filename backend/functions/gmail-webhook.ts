@@ -2,11 +2,11 @@ import { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Gmail } from '../services/gmail';
 import { Resource } from 'sst';
-import { Secrets } from '../services/secrets';
 import { db } from '../db';
 import { eq } from 'drizzle-orm';
 import { googleAccountDetails, oauthAccounts } from '../db/schema';
-import { logger } from '../services/logging';
+import { Secrets } from '@whiskey-platform/secrets';
+import { logger } from '@whiskey-platform/logging';
 
 type GmailWebhookBody = {
   message: {
